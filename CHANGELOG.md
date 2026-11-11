@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0-preview.1
+## 1.0.0
 
 - Introduce method-only defaults and explicit per-field capture options.
 - Add mandatory sensitive-name redaction and explicit header/query/JSON allowlists.

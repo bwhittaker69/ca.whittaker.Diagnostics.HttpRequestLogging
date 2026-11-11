@@ -4,7 +4,7 @@
     <PackageId>ca.whittaker.Diagnostics.HttpRequestLogging</PackageId>
     <AssemblyName>ca.whittaker.Diagnostics.HttpRequestLogging</AssemblyName>
     <RootNamespace>ca.whittaker.Diagnostics.HttpRequestLogging</RootNamespace>
-    <Version>1.0.0-preview.1</Version>
+    <Version>1.0.0</Version>
     <Authors>Brett Whittaker</Authors>
     <Title>Whittaker HTTP request diagnostics</Title>
     <Description>Explicit, bounded ASP.NET Core request diagnostics with opt-in JSON body capture and redaction.</Description>

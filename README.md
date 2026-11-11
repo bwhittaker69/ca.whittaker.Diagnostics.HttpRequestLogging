@@ -7,7 +7,7 @@ Explicit ASP.NET Core request diagnostics with opt-in capture and redaction. Int
 Targets .NET 9 and .NET 10. Requires the corresponding ASP.NET Core shared framework (`Microsoft.AspNetCore.App`) and a host logging provider. No runtime NuGet dependencies are added.
 
 ```powershell
-dotnet add package ca.whittaker.Diagnostics.HttpRequestLogging --version 1.0.0-preview.1
+dotnet add package ca.whittaker.Diagnostics.HttpRequestLogging --version 1.0.0
 ```
 
 ## Minimal quick start

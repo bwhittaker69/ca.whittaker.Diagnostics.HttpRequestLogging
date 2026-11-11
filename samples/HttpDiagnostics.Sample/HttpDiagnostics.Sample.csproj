@@ -3,6 +3,6 @@
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ca.whittaker.Diagnostics.HttpRequestLogging" Version="1.0.0-preview.1" />
+    <PackageReference Include="ca.whittaker.Diagnostics.HttpRequestLogging" Version="1.0.0" />
   </ItemGroup>
 </Project>
