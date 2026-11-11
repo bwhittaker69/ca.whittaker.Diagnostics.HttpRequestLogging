@@ -1,0 +1,94 @@
+name: Publish NuGet
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Authenticate only, or validate and publish the package
+        required: true
+        default: authenticate
+        type: choice
+        options:
+          - authenticate
+          - publish
+permissions:
+  contents: read
+concurrency:
+  group: nuget-publishing
+  cancel-in-progress: false
+jobs:
+  validate:
+    if: github.ref == 'refs/heads/main' && inputs.mode == 'publish'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: |
+            9.0.x
+            10.0.x
+      - name: Read package identity and version
+        id: package
+        shell: bash
+        run: |
+          project=ca.whittaker.Diagnostics.HttpRequestLogging/ca.whittaker.Diagnostics.HttpRequestLogging.csproj
+          echo "id=$(dotnet msbuild "$project" -getProperty:PackageId)" >> "$GITHUB_OUTPUT"
+          echo "version=$(dotnet msbuild "$project" -getProperty:PackageVersion)" >> "$GITHUB_OUTPUT"
+      - run: dotnet build ca.whittaker.Diagnostics.HttpRequestLogging.sln -c Release
+      - run: dotnet test ca.whittaker.Diagnostics.HttpRequestLogging.sln -c Release --no-build
+      - run: dotnet pack ca.whittaker.Diagnostics.HttpRequestLogging.sln -c Release --no-build -o artifacts
+      - name: Inspect packages and symbols
+        env:
+          PACKAGE_ID: ${{ steps.package.outputs.id }}
+          PACKAGE_VERSION: ${{ steps.package.outputs.version }}
+        run: dotnet run --project tools/PackageInspector -c Release -- "artifacts/$PACKAGE_ID.$PACKAGE_VERSION.nupkg" "artifacts/$PACKAGE_ID.$PACKAGE_VERSION.snupkg" "https://github.com/$GITHUB_REPOSITORY"
+      - run: dotnet restore samples/HttpDiagnostics.Sample --source "$GITHUB_WORKSPACE/artifacts"
+      - run: dotnet run --project samples/HttpDiagnostics.Sample -c Release --no-restore -- --self-test
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: nuget-packages
+          path: |
+            artifacts/*.nupkg
+            artifacts/*.snupkg
+          if-no-files-found: error
+  authenticate:
+    if: github.ref == 'refs/heads/main' && inputs.mode == 'authenticate'
+    runs-on: ubuntu-latest
+    environment: nuget
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Exchange token without publishing
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # verified v1
+        with:
+          user: BrettWhittaker
+      - run: echo "NuGet authentication succeeded. No package was published. Confirm permanent activation separately in the NuGet policy UI." >> "$GITHUB_STEP_SUMMARY"
+  publish:
+    needs: validate
+    if: github.ref == 'refs/heads/main' && inputs.mode == 'publish'
+    runs-on: ubuntu-latest
+    environment: nuget
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: nuget-packages
+          path: artifacts
+      - name: Obtain temporary publishing credential
+        id: login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # verified v1
+        with:
+          user: BrettWhittaker
+      - name: Push the validated package and associated symbols
+        shell: bash
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        run: |
+          packages=(artifacts/*.nupkg)
+          test "${#packages[@]}" -eq 1
+          test -f "${packages[0]}"
+          dotnet nuget push "${packages[0]}" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json

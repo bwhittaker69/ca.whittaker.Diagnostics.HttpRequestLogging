@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
+    <PackageId>ca.whittaker.Diagnostics.HttpRequestLogging</PackageId>
+    <AssemblyName>ca.whittaker.Diagnostics.HttpRequestLogging</AssemblyName>
+    <RootNamespace>ca.whittaker.Diagnostics.HttpRequestLogging</RootNamespace>
+    <Version>1.0.0-preview.1</Version>
+    <Authors>Brett Whittaker</Authors>
+    <Title>Whittaker HTTP request diagnostics</Title>
+    <Description>Explicit, bounded ASP.NET Core request diagnostics with opt-in JSON body capture and redaction.</Description>
+    <PackageTags>diagnostics;logging;aspnetcore;http;redaction;whittaker</PackageTags>
+    <Copyright>Copyright (c) 2026 Brett Whittaker</Copyright>
+    <PackageProjectUrl>https://github.com/bwhittaker69/ca.whittaker.Diagnostics.HttpRequestLogging</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/bwhittaker69/ca.whittaker.Diagnostics.HttpRequestLogging</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>bwhittaker69.png</PackageIcon>
+    <PackageReleaseNotes>Initial release: method-only defaults, opt-in allowlisted capture, mandatory sensitive-name redaction, bounded body inspection, and downstream stream preservation.</PackageReleaseNotes>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
+    <DebugType>portable</DebugType>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <None Include="../README.md" Pack="true" PackagePath="/" />
+    <None Include="../bwhittaker69.png" Pack="true" PackagePath="/" />
+    <None Include="../LICENSE.txt" Pack="true" PackagePath="/" />
+  </ItemGroup>
+</Project>
