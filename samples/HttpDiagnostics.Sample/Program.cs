@@ -12,8 +12,10 @@ static void Configure(RequestDiagnosticsOptions options)
 if (args.Contains("--self-test"))
 {
     var output = new CapturingProvider();
-    await using var services = new ServiceCollection().AddLogging(x => x.AddProvider(output)).BuildServiceProvider();
-    var pipeline = new ApplicationBuilder(services);
+    var selfTestBuilder = WebApplication.CreateBuilder();
+    selfTestBuilder.Logging.ClearProviders().AddProvider(output);
+    await using var host = selfTestBuilder.Build();
+    var pipeline = new ApplicationBuilder(host.Services);
     pipeline.UseRequestDiagnostics(Configure);
     string? received = null;
     pipeline.Run(async context =>
